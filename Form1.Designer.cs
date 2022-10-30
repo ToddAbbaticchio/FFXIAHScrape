@@ -74,7 +74,7 @@
             this.ItemList.FormattingEnabled = true;
             this.ItemList.Location = new System.Drawing.Point(378, 76);
             this.ItemList.Name = "ItemList";
-            this.ItemList.Size = new System.Drawing.Size(162, 108);
+            this.ItemList.Size = new System.Drawing.Size(344, 108);
             this.ItemList.TabIndex = 2;
             this.ItemList.SelectedIndexChanged += new System.EventHandler(this.ItemList_SelectedIndexChanged);
             // 
@@ -175,7 +175,7 @@
             this.MinimumSize = new System.Drawing.Size(750, 500);
             this.Name = "Form1";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
-            this.Text = "Walsh-o-Matic FFXI-AH Scraper";
+            this.Text = "FFXI-AH Scraper";
             ((System.ComponentModel.ISupportInitialize)(this.Result1Grid)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.constantsBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.constantsBindingSource1)).EndInit();

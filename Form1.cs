@@ -122,14 +122,15 @@ namespace FFXIAHScrape
             if (ItemList.SelectedIndex == -1)
                 return;
 
-            if (StackCheckBox.Checked)
+            if (StackCheckBox.Checked && !ItemList.SelectedItem.ToString().Contains(Constants.stack))
             {
                 var currVal = ItemList.SelectedItem.ToString();
                 var currIndex = ItemList.SelectedIndex;
                 ItemList.Items.RemoveAt(currIndex);
                 ItemList.Items.Insert(currIndex, $"{currVal}/{Constants.stack}");
             }
-            else
+            
+            if (!StackCheckBox.Checked && ItemList.SelectedItem.ToString().Contains(Constants.stack))
             {
                 var currVal = ItemList.SelectedItem.ToString();
                 var currIndex = ItemList.SelectedIndex;
