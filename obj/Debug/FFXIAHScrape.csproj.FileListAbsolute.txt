@@ -1,0 +1,17 @@
+E:\projects\_VSRepo\FFXIAHScrape\obj\Debug\FFXIAHScrape.csproj.AssemblyReference.cache
+E:\projects\_VSRepo\FFXIAHScrape\obj\Debug\FFXIAHScrape.csproj.SuggestedBindingRedirects.cache
+E:\projects\_VSRepo\FFXIAHScrape\obj\Debug\FFXIAHScrape.Form1.resources
+E:\projects\_VSRepo\FFXIAHScrape\obj\Debug\FFXIAHScrape.Properties.Resources.resources
+E:\projects\_VSRepo\FFXIAHScrape\obj\Debug\FFXIAHScrape.csproj.GenerateResource.cache
+E:\projects\_VSRepo\FFXIAHScrape\obj\Debug\FFXIAHScrape.csproj.CoreCompileInputs.cache
+E:\projects\_VSRepo\FFXIAHScrape\bin\Debug\FFXIAHScrape.exe.config
+E:\projects\_VSRepo\FFXIAHScrape\bin\Debug\FFXIAHScrape.exe
+E:\projects\_VSRepo\FFXIAHScrape\bin\Debug\FFXIAHScrape.pdb
+E:\projects\_VSRepo\FFXIAHScrape\obj\Debug\FFXIAHScrape.exe
+E:\projects\_VSRepo\FFXIAHScrape\obj\Debug\FFXIAHScrape.pdb
+E:\projects\_VSRepo\FFXIAHScrape\bin\Debug\HtmlAgilityPack.dll
+E:\projects\_VSRepo\FFXIAHScrape\bin\Debug\Newtonsoft.Json.dll
+E:\projects\_VSRepo\FFXIAHScrape\bin\Debug\HtmlAgilityPack.pdb
+E:\projects\_VSRepo\FFXIAHScrape\bin\Debug\HtmlAgilityPack.xml
+E:\projects\_VSRepo\FFXIAHScrape\bin\Debug\Newtonsoft.Json.xml
+E:\projects\_VSRepo\FFXIAHScrape\obj\Debug\FFXIAHScrape.csproj.CopyComplete
