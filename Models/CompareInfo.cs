@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FFXIAHScrape.Entities
+namespace FFXIAHScrape.Models
 {
     public class CompareInfo
     {
