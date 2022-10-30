@@ -13,6 +13,7 @@ using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -192,26 +193,12 @@ namespace FFXIAHScrape
                 var _htmlDocument = new HtmlDocument();
                 _htmlDocument.LoadHtml(result);
 
-                //var searchNode = _htmlDocument.DocumentNode.SelectNodes("//*[text()[contains(., 'Pixie Hairpin')]]");
-                HtmlNodeNavigator navigator = (HtmlNodeNavigator)_htmlDocument.CreateNavigator();
                 var nameNode = "/html[1]/body[1]/table[1]/tr[2]/td[2]/table[1]/tr[1]/td[1]/table[1]/tr[1]/td[2]/span[1]/span[1]/span[1]";
-                string stockNode;
-                string rateNode;
-                string medianNode;
-                var formatTestNode = "/html[1]/body[1]/table[1]/tr[2]/td[2]/table[1]/tr[1]/td[1]/table[1]/tr[3]/td[1]";
-                if (navigator.SelectSingleNode(formatTestNode).Value == "Info")
-                {
-                    stockNode = "/html[1]/body[1]/table[1]/tr[2]/td[2]/table[1]/tr[1]/td[1]/table[1]/tr[4]/td[2]";
-                    rateNode = "/html[1]/body[1]/table[1]/tr[2]/td[2]/table[1]/tr[1]/td[1]/table[1]/tr[5]/td[2]";
-                    medianNode = "/html[1]/body[1]/table[1]/tr[2]/td[2]/table[1]/tr[1]/td[1]/table[1]/tr[6]/td[2]";
-                }
-                else
-                {
-                    stockNode = "/html[1]/body[1]/table[1]/tr[2]/td[2]/table[1]/tr[1]/td[1]/table[1]/tr[5]/td[2]";
-                    rateNode = "/html[1]/body[1]/table[1]/tr[2]/td[2]/table[1]/tr[1]/td[1]/table[1]/tr[6]/td[2]";
-                    medianNode = "/html[1]/body[1]/table[1]/tr[2]/td[2]/table[1]/tr[1]/td[1]/table[1]/tr[7]/td[2]";
-                }
+                var stockNode = GetValueXPath(_htmlDocument, "Stock");
+                var rateNode = GetValueXPath(_htmlDocument, "Rate");
+                var medianNode = GetValueXPath(_htmlDocument, "Median");
 
+                HtmlNodeNavigator navigator = (HtmlNodeNavigator)_htmlDocument.CreateNavigator();
                 return new PriceInfo
                 {
                     Server = server,
@@ -225,6 +212,13 @@ namespace FFXIAHScrape
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        private string GetValueXPath(HtmlDocument htmlDoc, string valName)
+        {
+            var getNameField = htmlDoc.DocumentNode.SelectNodes($"//*[text()[contains(., '{valName}')]]").Where(x => x.InnerText == valName).First().XPath;
+            string result = Regex.Replace(getNameField, "td\\[1\\]$", "td[2]");
+            return result;
         }
 
         /*private async Task<PriceInfo> ScrapeItem(Uri itemUri, string server)
