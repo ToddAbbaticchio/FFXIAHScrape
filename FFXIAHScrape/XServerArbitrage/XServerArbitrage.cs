@@ -1,11 +1,11 @@
 ﻿using FFXIAHScrape.Entities;
-using FFXIAHScrape.Models;
+using FFXIAHScrape.FFXIAHScrape._SharedModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace FFXIAHScrape.OperationalModes.XServerArbitrage
+namespace FFXIAHScrape.FFXIAHScrape.XServerArbitrage
 {
     public class XServerArbitrage
     {

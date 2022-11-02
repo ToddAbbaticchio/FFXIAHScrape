@@ -40,22 +40,9 @@ namespace FFXIAHScrape
             this.Result1Grid = new System.Windows.Forms.DataGridView();
             this.RemFromListButton = new System.Windows.Forms.Button();
             this.ModeDrop = new System.Windows.Forms.ComboBox();
-            this.TextBox = new PHTextBox("Enter Item Name...");
-            this.ListPrice = new PHTextBox("Enter Listed Price...");
             this.ModeDisplay = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.Result1Grid)).BeginInit();
             this.SuspendLayout();
-
-            // 
-            // ModeDrop
-            // 
-            this.ModeDrop.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.ModeDrop.FormattingEnabled = true;
-            this.ModeDrop.Location = new System.Drawing.Point(603, 12);
-            this.ModeDrop.Name = "ModeDrop";
-            this.ModeDrop.Size = new System.Drawing.Size(121, 21);
-            this.ModeDrop.TabIndex = 0;
-            this.ModeDrop.SelectedIndexChanged += new System.EventHandler(this.ModeDrop_SelectedIndexChanged);
             // 
             // Server1Drop
             // 
@@ -79,37 +66,15 @@ namespace FFXIAHScrape
             this.Server2Drop.TabIndex = 2;
             this.Server2Drop.SelectedIndexChanged += new System.EventHandler(this.Server2Drop_SelectedIndexChanged);
             // 
-            // TextBox
+            // ItemList
             // 
-            this.TextBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.TextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-            this.TextBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this.TextBox.Location = new System.Drawing.Point(119, 76);
-            this.TextBox.Name = "TextBox";
-            this.TextBox.Size = new System.Drawing.Size(162, 20);
-            this.TextBox.TabIndex = 3;
-            // 
-            // ListPrice
-            // 
-            this.ListPrice.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.ListPrice.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-            this.ListPrice.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this.ListPrice.Location = new System.Drawing.Point(119, 104);
-            this.ListPrice.Name = "ListPrice";
-            this.ListPrice.Size = new System.Drawing.Size(162, 20);
-            this.ListPrice.TabIndex = 4;
-            // 
-            // StackCheckBox
-            // 
-            this.StackCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.StackCheckBox.AutoSize = true;
-            this.StackCheckBox.Location = new System.Drawing.Point(164, 130);
-            this.StackCheckBox.Name = "StackCheckBox";
-            this.StackCheckBox.Size = new System.Drawing.Size(60, 17);
-            this.StackCheckBox.TabIndex = 5;
-            this.StackCheckBox.Text = "Stack?";
-            this.StackCheckBox.UseVisualStyleBackColor = true;
-            this.StackCheckBox.CheckedChanged += new System.EventHandler(this.StackCheckBox_CheckedChanged);
+            this.ItemList.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.ItemList.FormattingEnabled = true;
+            this.ItemList.Location = new System.Drawing.Point(378, 76);
+            this.ItemList.Name = "ItemList";
+            this.ItemList.Size = new System.Drawing.Size(344, 108);
+            this.ItemList.TabIndex = 8;
+            this.ItemList.SelectedIndexChanged += new System.EventHandler(this.ItemList_SelectedIndexChanged);
             // 
             // AddToListButton
             // 
@@ -122,26 +87,17 @@ namespace FFXIAHScrape
             this.AddToListButton.UseVisualStyleBackColor = true;
             this.AddToListButton.Click += new System.EventHandler(this.AddToListButton_Click);
             // 
-            // RemFromListButton
+            // StackCheckBox
             // 
-            this.RemFromListButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.RemFromListButton.Location = new System.Drawing.Point(317, 103);
-            this.RemFromListButton.Name = "RemFromListButton";
-            this.RemFromListButton.Size = new System.Drawing.Size(27, 21);
-            this.RemFromListButton.TabIndex = 7;
-            this.RemFromListButton.Text = "<<";
-            this.RemFromListButton.UseVisualStyleBackColor = true;
-            this.RemFromListButton.Click += new System.EventHandler(this.RemFromListButton_Click);
-            // 
-            // ItemList
-            // 
-            this.ItemList.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.ItemList.FormattingEnabled = true;
-            this.ItemList.Location = new System.Drawing.Point(378, 76);
-            this.ItemList.Name = "ItemList";
-            this.ItemList.Size = new System.Drawing.Size(344, 108);
-            this.ItemList.TabIndex = 8;
-            this.ItemList.SelectedIndexChanged += new System.EventHandler(this.ItemList_SelectedIndexChanged);
+            this.StackCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.StackCheckBox.AutoSize = true;
+            this.StackCheckBox.Location = new System.Drawing.Point(164, 130);
+            this.StackCheckBox.Name = "StackCheckBox";
+            this.StackCheckBox.Size = new System.Drawing.Size(60, 17);
+            this.StackCheckBox.TabIndex = 5;
+            this.StackCheckBox.Text = "Stack?";
+            this.StackCheckBox.UseVisualStyleBackColor = true;
+            this.StackCheckBox.CheckedChanged += new System.EventHandler(this.StackCheckBox_CheckedChanged);
             // 
             // GoButton
             // 
@@ -168,8 +124,56 @@ namespace FFXIAHScrape
             this.Result1Grid.Size = new System.Drawing.Size(710, 254);
             this.Result1Grid.TabIndex = 10;
             // 
+            // RemFromListButton
+            // 
+            this.RemFromListButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.RemFromListButton.Location = new System.Drawing.Point(317, 103);
+            this.RemFromListButton.Name = "RemFromListButton";
+            this.RemFromListButton.Size = new System.Drawing.Size(27, 21);
+            this.RemFromListButton.TabIndex = 7;
+            this.RemFromListButton.Text = "<<";
+            this.RemFromListButton.UseVisualStyleBackColor = true;
+            this.RemFromListButton.Click += new System.EventHandler(this.RemFromListButton_Click);
+            // 
+            // ModeDrop
+            // 
+            this.ModeDrop.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.ModeDrop.FormattingEnabled = true;
+            this.ModeDrop.Location = new System.Drawing.Point(603, 12);
+            this.ModeDrop.Name = "ModeDrop";
+            this.ModeDrop.Size = new System.Drawing.Size(121, 21);
+            this.ModeDrop.TabIndex = 0;
+            this.ModeDrop.SelectedIndexChanged += new System.EventHandler(this.ModeDrop_SelectedIndexChanged);
+            // 
+            // TextBox
+            // 
+            this.TextBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.TextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.TextBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.TextBox.ForeColor = System.Drawing.Color.Gray;
+            this.TextBox.Location = new System.Drawing.Point(119, 76);
+            this.TextBox.Name = "TextBox";
+            this.TextBox.PlaceHolderText = "Enter Item Name...";
+            this.TextBox.Size = new System.Drawing.Size(162, 20);
+            this.TextBox.TabIndex = 3;
+            this.TextBox.Text = "Enter Item Name...";
+            // 
+            // ListPrice
+            // 
+            this.ListPrice.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.ListPrice.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.ListPrice.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.ListPrice.ForeColor = System.Drawing.Color.Gray;
+            this.ListPrice.Location = new System.Drawing.Point(119, 104);
+            this.ListPrice.Name = "ListPrice";
+            this.ListPrice.PlaceHolderText = "Enter Listed Price...";
+            this.ListPrice.Size = new System.Drawing.Size(162, 20);
+            this.ListPrice.TabIndex = 4;
+            this.ListPrice.Text = "Enter Listed Price...";
+            // 
             // ModeDisplay
             // 
+            this.ModeDisplay.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.ModeDisplay.AutoSize = true;
             this.ModeDisplay.Location = new System.Drawing.Point(279, 9);
             this.ModeDisplay.Name = "ModeDisplay";
@@ -212,15 +216,15 @@ namespace FFXIAHScrape
         private System.Windows.Forms.ComboBox Server1Drop;
         private System.Windows.Forms.ComboBox Server2Drop;
         private System.Windows.Forms.ListBox ItemList;
-        private System.Windows.Forms.TextBox TextBox;
         private System.Windows.Forms.Button AddToListButton;
         private System.Windows.Forms.CheckBox StackCheckBox;
         private System.Windows.Forms.Button GoButton;
         private System.Windows.Forms.DataGridView Result1Grid;
         private System.Windows.Forms.Button RemFromListButton;
         private System.Windows.Forms.ComboBox ModeDrop;
-        private System.Windows.Forms.TextBox ListPrice;
         private System.Windows.Forms.Label ModeDisplay;
+        private FFXIAHScrape.Extensions.PHTextBox TextBox;
+        private FFXIAHScrape.Extensions.PHTextBox ListPrice;
     }
 }
 

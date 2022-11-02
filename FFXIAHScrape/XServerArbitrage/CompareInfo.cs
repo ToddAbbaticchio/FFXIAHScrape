@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FFXIAHScrape.OperationalModes.XServerArbitrage
+namespace FFXIAHScrape.FFXIAHScrape.XServerArbitrage
 {
     public class CompareInfo
     {

@@ -1,8 +1,8 @@
 ﻿using FFXIAHScrape.Entities;
-using FFXIAHScrape.Models;
-using FFXIAHScrape.OperationalModes.RareItemAlert;
-using FFXIAHScrape.OperationalModes.UndercutAlert;
-using FFXIAHScrape.OperationalModes.XServerArbitrage;
+using FFXIAHScrape.FFXIAHScrape._SharedModels;
+using FFXIAHScrape.FFXIAHScrape.RareItemAlert;
+using FFXIAHScrape.FFXIAHScrape.UndercutAlert;
+using FFXIAHScrape.FFXIAHScrape.XServerArbitrage;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
@@ -12,9 +12,8 @@ namespace FFXIAHScrape
 {
     public partial class Form1 : Form
     {
-        //public bool autoRefreshMode = false;
         public bool AutoRefreshMode { get; set; }
-        public int refreshTimer { get; set; }
+        public int RefreshTimer { get; set; }
 
         readonly UndercutAlert _undercutAlert = new UndercutAlert();
         readonly RareItemAlert _rareItemAlert = new RareItemAlert();
@@ -58,7 +57,7 @@ namespace FFXIAHScrape
                     ListPrice.Hide();
                     StackCheckBox.Location = stackCheckPos1;
                     GoButton.Location = goButtonPos1;
-                    refreshTimer = 60;
+                    RefreshTimer = 60;
                     ListPrice.Text = "";
                     break;
                 case Modes.UndercutAlert:
@@ -68,7 +67,7 @@ namespace FFXIAHScrape
                     ListPrice.Text = "Enter Listed Price...";
                     StackCheckBox.Location = stackCheckPos2;
                     GoButton.Location = goButtonPos2;
-                    refreshTimer = 300;
+                    RefreshTimer = 300;
                     break;
                 case Modes.XServerArbitrage:
                     Server2Drop.Show();
@@ -76,7 +75,7 @@ namespace FFXIAHScrape
                     StackCheckBox.Location = stackCheckPos1;
                     GoButton.Location = goButtonPos1;
                     Server2Drop.SelectedIndex = 0;
-                    refreshTimer = 3600;
+                    RefreshTimer = 3600;
                     ListPrice.Text = "";
                     break;
             }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FFXIAHScrape.Models
+namespace FFXIAHScrape.FFXIAHScrape._SharedModels
 {
     public class ItemQueryReturnBase
     {

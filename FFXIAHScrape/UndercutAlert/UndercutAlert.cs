@@ -1,39 +1,43 @@
 ﻿using FFXIAHScrape.Entities;
-using FFXIAHScrape.Models;
+using FFXIAHScrape.FFXIAHScrape._SharedModels;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace FFXIAHScrape.OperationalModes.RareItemAlert
+namespace FFXIAHScrape.FFXIAHScrape.UndercutAlert
 {
-    public class RareItemAlert
+    public class UndercutAlert
     {
         readonly FFXIAhHelper _ffxiahHelper = new FFXIAhHelper();
-
+        
         public async Task Action(ListBox itemList, DataGridView resultGrid, Label modeLabel, string serverName)
         {
-            var alertItems = new List<RareItemAlertReturn>();
+            var undercutAlertItems = new List<UndercutAlertReturn>();
             foreach (string item in itemList.Items)
             {
+                var myPrice = JsonConvert.DeserializeObject<UndercutAlertInfo>(item).MyPrice;
                 var itemUri = _ffxiahHelper.GetItemUri(item);
 
-                var itemInfo = (RareItemAlertReturn)await _ffxiahHelper.ScrapeItem(itemUri, serverName, Modes.RareItemAlert);
-                alertItems.Add(itemInfo);
+                var itemInfo = (UndercutAlertReturn)await _ffxiahHelper.ScrapeItem(itemUri, serverName, Modes.UndercutAlert);
+                itemInfo.MyListPrice = myPrice;
+                undercutAlertItems.Add(itemInfo);
             }
 
-            resultGrid.DataSource = alertItems;
+            resultGrid.DataSource = undercutAlertItems;
             resultGrid.Columns["Server"].Visible = false;
             resultGrid.Columns["ItemName"].DisplayIndex = 0;
-            resultGrid.Columns["Stock"].DisplayIndex = 1;
+            resultGrid.Columns["MyListPrice"].DisplayIndex = 1;
             resultGrid.Columns["LastSalePrice"].DisplayIndex = 2;
 
             foreach (DataGridViewRow row in resultGrid.Rows)
             {
-                var gridStock = Convert.ToInt16(row.Cells[0].Value);
+                var gridMyPrice = Convert.ToInt64(row.Cells[0].Value);
+                var gridLastSalePrice = Convert.ToInt64(row.Cells[1].Value);
 
-                if (gridStock == 0)
+                if (gridMyPrice > gridLastSalePrice)
                 {
                     row.Cells[0].Style.BackColor = Color.Red;
                 }

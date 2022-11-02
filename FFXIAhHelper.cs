@@ -1,5 +1,5 @@
 ﻿using FFXIAHScrape.Entities;
-using FFXIAHScrape.Models;
+using FFXIAHScrape.FFXIAHScrape._SharedModels;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using System;

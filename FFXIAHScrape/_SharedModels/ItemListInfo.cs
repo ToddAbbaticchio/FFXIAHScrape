@@ -1,4 +1,4 @@
-﻿namespace FFXIAHScrape.Models
+﻿namespace FFXIAHScrape.FFXIAHScrape._SharedModels
 {
     public class ItemListInfoBase
     {

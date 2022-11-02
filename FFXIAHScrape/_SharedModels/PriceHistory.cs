@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows.Forms;
-
-namespace FFXIAHScrape.Models
+﻿namespace FFXIAHScrape.FFXIAHScrape._SharedModels
 {
 
     public class PriceHistory
