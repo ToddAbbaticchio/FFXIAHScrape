@@ -1,34 +1,37 @@
 ﻿using FFXIAHScrape.Entities;
 using FFXIAHScrape.Models;
-using HtmlAgilityPack;
+using FFXIAHScrape.OperationalModes.RareItemAlert;
+using FFXIAHScrape.OperationalModes.UndercutAlert;
+using FFXIAHScrape.OperationalModes.XServerArbitrage;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Net.Mime.MediaTypeNames;
-using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 
 namespace FFXIAHScrape
 {
     public partial class Form1 : Form
     {
+        //public bool autoRefreshMode = false;
+        public bool AutoRefreshMode { get; set; }
+        public int refreshTimer { get; set; }
+
+        readonly UndercutAlert _undercutAlert = new UndercutAlert();
+        readonly RareItemAlert _rareItemAlert = new RareItemAlert();
+        readonly XServerArbitrage _xServerArbitrage = new XServerArbitrage();
+
         public Form1()
         {
             InitializeComponent();
-            
-            
+
+            ModeDrop.DataSource = Enum.GetValues(typeof(Modes));
+
+            var autoCompleteArray = Items.Info.Keys.ToArray();
+            var source = new AutoCompleteStringCollection();
+            source.AddRange(autoCompleteArray);
+
+            TextBox.AutoCompleteCustomSource = source;
+
             var serverList1 = Servers.Info.Keys.ToList();
             serverList1.Add("-- Choose Server 1 --");
             serverList1.Sort();
@@ -38,16 +41,57 @@ namespace FFXIAHScrape
             serverList2.Add("-- Choose Server 2 --");
             serverList2.Sort();
             Server2Drop.DataSource = serverList2;
+        }
 
-            var autoCompleteArray = Items.Info.Keys.ToArray();
-            var source = new AutoCompleteStringCollection();
-            source.AddRange(autoCompleteArray);
-            TextBox.AutoCompleteCustomSource = source;
+        private void ModeDrop_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var stackCheckPos1 = new System.Drawing.Point(172, 107);
+            var stackCheckPos2 = new System.Drawing.Point(164, 130);
+            var goButtonPos1 = new System.Drawing.Point(139, 139);
+            var goButtonPos2 = new System.Drawing.Point(142, 153);
+
+            switch (ModeDrop.SelectedValue)
+            {
+                case Modes.RareItemAlert:
+                    Server2Drop.SelectedIndex = -1;
+                    Server2Drop.Hide();
+                    ListPrice.Hide();
+                    StackCheckBox.Location = stackCheckPos1;
+                    GoButton.Location = goButtonPos1;
+                    refreshTimer = 60;
+                    ListPrice.Text = "";
+                    break;
+                case Modes.UndercutAlert:
+                    Server2Drop.SelectedIndex = -1;
+                    Server2Drop.Hide();
+                    ListPrice.Show();
+                    ListPrice.Text = "Enter Listed Price...";
+                    StackCheckBox.Location = stackCheckPos2;
+                    GoButton.Location = goButtonPos2;
+                    refreshTimer = 300;
+                    break;
+                case Modes.XServerArbitrage:
+                    Server2Drop.Show();
+                    ListPrice.Hide();
+                    StackCheckBox.Location = stackCheckPos1;
+                    GoButton.Location = goButtonPos1;
+                    Server2Drop.SelectedIndex = 0;
+                    refreshTimer = 3600;
+                    ListPrice.Text = "";
+                    break;
+            }
+
+            GoButton.Text = "Check FFXI-AH";
+            AutoRefreshMode = false;
+            ModeDisplay.Text = "";
+            StackCheckBox.Checked = false;
+            ItemList.Items.Clear();
+            Result1Grid.DataSource = null;
         }
 
         private void Server1Drop_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (Server1Drop.SelectedValue.ToString().Contains("Choose Server"))
+            if (Server1Drop.SelectedIndex == -1 || Server1Drop.SelectedValue.ToString().Contains("Choose Server"))
                 return;
 
             if (Server1Drop.SelectedValue == Server2Drop.SelectedValue)
@@ -59,7 +103,7 @@ namespace FFXIAHScrape
 
         private void Server2Drop_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (Server2Drop.SelectedValue.ToString().Contains("Choose Server"))
+            if (Server2Drop.SelectedIndex == -1 || Server2Drop.SelectedValue.ToString().Contains("Choose Server"))
                 return;
             
             if (Server1Drop.SelectedValue == Server2Drop.SelectedValue)
@@ -69,47 +113,13 @@ namespace FFXIAHScrape
             }
         }
 
-        private void AddToListButton_Click(object sender, EventArgs e)
-        {
-            var inputString = TextBox.Text;
-
-            if (Items.Info.ContainsKey(inputString))
-            {
-                if (StackCheckBox.Checked)
-                {
-                    ItemList.Items.Add($"{Items.Info[inputString]}/{inputString.Replace(" ", "-")}/{Constants.stack}");
-                    TextBox.Text = "";
-                    StackCheckBox.Checked = false;
-                    return;
-                }
-
-                ItemList.Items.Add($"{Items.Info[inputString]}/{inputString.Replace(" ", "_").Replace("'", "")}");
-                TextBox.Text = "";
-                StackCheckBox.Checked = false;
-            }
-            else
-            {
-                MessageBox.Show("I HATE THIS STRING. NOT ALLOWED!");
-                TextBox.Text = "";
-            }
-        }
-
-        private void RemFromListButton_Click(object sender, EventArgs e)
-        {
-            if (ItemList.SelectedIndex == -1)
-            {
-                MessageBox.Show("Select an item to remove before clicking remove button!");
-                return;
-            }
-            ItemList.Items.RemoveAt(ItemList.SelectedIndex);
-        }
-
         private void ItemList_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (ItemList.SelectedIndex == -1)
                 return;
 
-            if (ItemList.SelectedItem.ToString().Contains(Constants.stack))
+            var selectedItemInfo = JsonConvert.DeserializeObject<ItemListInfoBase>(ItemList.SelectedItem.ToString());
+            if (selectedItemInfo.Stack == true)
             {
                 StackCheckBox.Checked = true;
             }
@@ -124,138 +134,150 @@ namespace FFXIAHScrape
             if (ItemList.SelectedIndex == -1)
                 return;
 
-            if (StackCheckBox.Checked && !ItemList.SelectedItem.ToString().Contains(Constants.stack))
-            {
-                var currVal = ItemList.SelectedItem.ToString();
-                var currIndex = ItemList.SelectedIndex;
-                ItemList.Items.RemoveAt(currIndex);
-                ItemList.Items.Insert(currIndex, $"{currVal}/{Constants.stack}");
-            }
+            var itemInfo = JsonConvert.DeserializeObject<ItemListInfoBase>(ItemList.SelectedItem.ToString());
             
-            if (!StackCheckBox.Checked && ItemList.SelectedItem.ToString().Contains(Constants.stack))
+            if (StackCheckBox.Checked && itemInfo.Stack == false)
             {
-                var currVal = ItemList.SelectedItem.ToString();
                 var currIndex = ItemList.SelectedIndex;
                 ItemList.Items.RemoveAt(currIndex);
-                ItemList.Items.Insert(currIndex, currVal.Replace($"/{Constants.stack}", ""));
+                itemInfo.Stack = true;
+                ItemList.Items.Insert(currIndex, JsonConvert.SerializeObject(itemInfo));
+            }
+
+            if (!StackCheckBox.Checked && itemInfo.Stack == true)
+            {
+                var currIndex = ItemList.SelectedIndex;
+                ItemList.Items.RemoveAt(currIndex);
+                itemInfo.Stack = false;
+                ItemList.Items.Insert(currIndex, JsonConvert.SerializeObject(itemInfo));
             }
         }
 
-        private async void GoButton_Click(object sender, EventArgs e)
+        private void AddToListButton_Click(object sender, EventArgs e)
         {
-            if (ItemList.Items.Count == 0)
+            var inputString = TextBox.Text;
+
+            if (Items.Info.ContainsKey(inputString))
             {
-                MessageBox.Show("You should add some items first, friend.");
+                switch (ModeDrop.SelectedValue)
+                {
+                    case Modes.RareItemAlert:
+                        ItemList.Items.Add(JsonConvert.SerializeObject(
+                            new
+                            {
+                                Item = TextBox.Text.Replace(" ", "-").Replace("'", ""),
+                                Id = Items.Info[TextBox.Text],
+                                Stack = StackCheckBox.Checked,
+                            }
+                        ));
+                        break;
+
+                    case Modes.UndercutAlert:
+                        var validPrice = int.TryParse(ListPrice.Text, out var listPrice);
+                        if (!validPrice)
+                        {
+                            MessageBox.Show($"Enter a valid number for your list price. {ListPrice.Text} is a nogo!");
+                            return;
+                        }
+
+                        ItemList.Items.Add(JsonConvert.SerializeObject(
+                            new
+                            {
+                                Item = TextBox.Text.Replace(" ", "-").Replace("'", ""),
+                                Id = Items.Info[TextBox.Text],
+                                Stack = StackCheckBox.Checked,
+                                MyPrice = listPrice,
+                            }
+                        ));
+                        break;
+
+                    case Modes.XServerArbitrage:
+                        ItemList.Items.Add(JsonConvert.SerializeObject(
+                            new
+                            {
+                                Item = TextBox.Text.Replace(" ", "-").Replace("'", ""),
+                                Id = Items.Info[TextBox.Text],
+                                Stack = StackCheckBox.Checked,
+                            }
+                        ));
+                        break;
+                }
+
+                TextBox.Text = "";
+                ListPrice.Text = "";
+                StackCheckBox.Checked = false;
+            }
+            else
+            {
+                MessageBox.Show("THIS ISNT A REAL ITEM. NOT ALLOWED!");
+                TextBox.Text = "";
+                ListPrice.Text = "";
+            }
+        }
+
+        private void RemFromListButton_Click(object sender, EventArgs e)
+        {
+            if (ItemList.SelectedIndex == -1)
+            {
+                MessageBox.Show("Select an item to remove before clicking remove button!");
                 return;
             }
-
-            var compareList = new List<CompareInfo>();
-            foreach (string item in ItemList.Items)
-            {
-                var itemUri = new Uri($"{Constants.baseUrl}/{item}");
+            ItemList.Items.RemoveAt(ItemList.SelectedIndex);
+        }
                 
-                //MessageBox.Show(urlEnd.ToString());
-                //var s1 = await ScrapeItem(itemUri, Server1Drop.SelectedValue.ToString());
-                //var s2 = await ScrapeItem(itemUri, Server2Drop.SelectedValue.ToString());
-
-                var s1 = await WCScrapeItem(itemUri, Server1Drop.SelectedValue.ToString());
-                var s2 = await WCScrapeItem(itemUri, Server2Drop.SelectedValue.ToString());
-
-                compareList.Add(new CompareInfo()
+        private async void GoButton_Click(object sender, EventArgs e)
+        {
+            if (ItemList.Items.Count == 0) return;
+            if (!AutoRefreshMode)
+            {
+                AutoRefreshMode = true;
+                GoButton.Text = "Stop Scraping";
+                
+                while (AutoRefreshMode == true)
                 {
-                    ItemName = s1.ItemName,
-                    S1_Stock = s1.Stock,
-                    S1_Rate = s1.Rate,
-                    S1_Median = s1.Median,
-                    S2_Stock = s2.Stock,
-                    S2_Rate = s2.Rate,
-                    S2_Median = s2.Median,
-                });
+                    switch (ModeDrop.SelectedValue)
+                    {
+                        case Modes.RareItemAlert:
+                            await _rareItemAlert.Action(ItemList, Result1Grid, ModeDisplay, Server1Drop.SelectedValue.ToString());
+                            break;
+                        case Modes.UndercutAlert:
+                            await _undercutAlert.Action(ItemList, Result1Grid, ModeDisplay, Server1Drop.SelectedValue.ToString());
+                            break;
+
+                        case Modes.XServerArbitrage:
+                            await _xServerArbitrage.Action(ItemList, Result1Grid, ModeDisplay, Server1Drop.SelectedValue.ToString(), Server2Drop.SelectedValue.ToString());
+                            break;
+                    }
+                    WaitWithoutLockingGui(300);
+                }
             }
-            Result1Grid.DataSource = compareList;
-            Result1Grid.Columns[1].HeaderText = $"{Server1Drop.SelectedValue}-Stock";
-            Result1Grid.Columns[2].HeaderText = $"{Server1Drop.SelectedValue}-Rate";
-            Result1Grid.Columns[3].HeaderText = $"{Server1Drop.SelectedValue}-Median";
-            Result1Grid.Columns[4].HeaderText = $"{Server2Drop.SelectedValue}-Stock";
-            Result1Grid.Columns[5].HeaderText = $"{Server2Drop.SelectedValue}-Rate";
-            Result1Grid.Columns[6].HeaderText = $"{Server2Drop.SelectedValue}-Median";
+            else
+            {
+                AutoRefreshMode = false;
+                GoButton.Text = "Check FFXI-AH";
+            }
+            ModeDisplay.Text = "";
         }
 
-        private async Task<PriceInfo> WCScrapeItem(Uri itemUri, string server)
+        public void WaitWithoutLockingGui(int seconds)
         {
-            try
+            var timer1 = new System.Windows.Forms.Timer();
+            if (seconds <= 0) return;
+
+            timer1.Interval = seconds * 1000;
+            timer1.Enabled = true;
+            timer1.Start();
+
+            timer1.Tick += (s, e) =>
             {
-                WebClient client = new WebClient();
-                client.Headers.Add("cookie", $"sid={Servers.Info[server]}");
-                var result = await client.DownloadStringTaskAsync(itemUri);
-
-                // process html data
-                var _htmlDocument = new HtmlDocument();
-                _htmlDocument.LoadHtml(result);
-
-                var nameNode = "/html[1]/body[1]/table[1]/tr[2]/td[2]/table[1]/tr[1]/td[1]/table[1]/tr[1]/td[2]/span[1]/span[1]/span[1]";
-                var stockNode = GetValueXPath(_htmlDocument, "Stock");
-                var rateNode = GetValueXPath(_htmlDocument, "Rate");
-                var medianNode = GetValueXPath(_htmlDocument, "Median");
-
-                HtmlNodeNavigator navigator = (HtmlNodeNavigator)_htmlDocument.CreateNavigator();
-                return new PriceInfo
-                {
-                    Server = server,
-                    ItemName = navigator.SelectSingleNode(nameNode).Value,
-                    Stock = navigator.SelectSingleNode(stockNode).Value,
-                    Rate = navigator.SelectSingleNode(rateNode).Value,
-                    Median = navigator.SelectSingleNode(medianNode).Value,
-                };
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        private string GetValueXPath(HtmlDocument htmlDoc, string valName)
-        {
-            var getNameField = htmlDoc.DocumentNode.SelectNodes($"//*[text()[contains(., '{valName}')]]").Where(x => x.InnerText == valName).First().XPath;
-            string result = Regex.Replace(getNameField, "td\\[1\\]$", "td[2]");
-            return result;
-        }
-
-        /*private async Task<PriceInfo> ScrapeItem(Uri itemUri, string server)
-        {
-            //itemUri = new Uri("https://eoxzkdr9tyug77x.m.pipedream.net");
-            
-            var sidCookie = new Cookie("sid", Servers.Info[server].ToString());
-            CookieContainer cookieJar = new CookieContainer();
-            cookieJar.Add(itemUri, sidCookie);
-            HttpClientHandler handler = new HttpClientHandler() { CookieContainer = cookieJar };
-            HttpClient client = new HttpClient(handler, true);
-
-            var response = await client.GetAsync(itemUri);
-            response.EnsureSuccessStatusCode();
-            var result = await response.Content.ReadAsStringAsync();
-
-            //return new PriceInfo();
-
-            // process html data
-            var _htmlDocument = new HtmlDocument();
-            _htmlDocument.LoadHtml(result);
-
-            //var searchNode = _htmlDocument.DocumentNode.SelectNodes("//*[text()[contains(., 'Pixie Hairpin')]]");
-            HtmlNodeNavigator navigator = (HtmlNodeNavigator)_htmlDocument.CreateNavigator();
-            var namePath = "/html[1]/body[1]/table[1]/tr[2]/td[2]/table[1]/tr[1]/td[1]/table[1]/tr[1]/td[2]/span[1]/span[1]/span[1]";
-            var stockPath = "/html[1]/body[1]/table[1]/tr[2]/td[2]/table[1]/tr[1]/td[1]/table[1]/tr[4]/td[2]";
-            var ratePath = "/html[1]/body[1]/table[1]/tr[2]/td[2]/table[1]/tr[1]/td[1]/table[1]/tr[5]/td[2]";
-            var medianPath = "/html[1]/body[1]/table[1]/tr[2]/td[2]/table[1]/tr[1]/td[1]/table[1]/tr[6]/td[2]";
-
-            return new PriceInfo
-            {
-                Server = server,
-                ItemName = navigator.SelectSingleNode(namePath).Value,
-                Stock = navigator.SelectSingleNode(stockPath).Value,
-                Rate = navigator.SelectSingleNode(ratePath).Value,
-                Median = navigator.SelectSingleNode(medianPath).Value,
+                timer1.Enabled = false;
+                timer1.Stop();
             };
-        }*/
+
+            while (timer1.Enabled)
+            {
+                Application.DoEvents();
+            }
+        }
     }
 }
