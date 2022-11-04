@@ -72,7 +72,7 @@
     <Compile Include="Extensions\PHTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="FFXIAhHelper.cs" />
+    <Compile Include="FFXIAHScrape\FFXIAhHelper.cs" />
     <Compile Include="FFXIAHScrape\XServerArbitrage\CompareInfo.cs" />
     <Compile Include="FFXIAHScrape\_SharedModels\ItemListInfo.cs" />
     <Compile Include="FFXIAHScrape\_SharedModels\PriceHistory.cs" />
@@ -89,7 +89,7 @@
     <Compile Include="FFXIAHScrape\XServerArbitrage\XServerArbitrage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Constants.cs" />
+    <Compile Include="FFXIAHScrape\Constants.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

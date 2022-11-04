@@ -9,7 +9,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace FFXIAHScrape
+namespace FFXIAHScrape.FFXIAHScrape
 {
     public class FFXIAhHelper
     {
@@ -78,7 +78,7 @@ namespace FFXIAHScrape
 
         public Uri GetItemUri(string itemJson)
         {
-            var itemInfo = JsonConvert.DeserializeObject<UndercutAlertInfo>(itemJson);
+            var itemInfo = JsonConvert.DeserializeObject<ItemListInfoBase>(itemJson);
             var itemUri = (itemInfo.Stack)
                 ? new Uri($"{Constants.baseUrl}/{itemInfo.Id}/{itemInfo.Item}/{Constants.stack}")
                 : new Uri($"{Constants.baseUrl}/{itemInfo.Id}/{itemInfo.Item}");

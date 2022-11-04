@@ -13,24 +13,26 @@ namespace FFXIAHScrape.FFXIAHScrape.UndercutAlert
     {
         readonly FFXIAhHelper _ffxiahHelper = new FFXIAhHelper();
         
-        public async Task Action(ListBox itemList, DataGridView resultGrid, Label modeLabel, string serverName)
+        public async Task Action(ListBox itemList, DataGridView resultGrid, Label modeLabel)
         {
             var undercutAlertItems = new List<UndercutAlertReturn>();
             foreach (string item in itemList.Items)
             {
-                var myPrice = JsonConvert.DeserializeObject<UndercutAlertInfo>(item).MyPrice;
+                var itemInfo = JsonConvert.DeserializeObject<UndercutAlertItemInfo>(item);
+                var myPrice = itemInfo.MyPrice;
                 var itemUri = _ffxiahHelper.GetItemUri(item);
 
-                var itemInfo = (UndercutAlertReturn)await _ffxiahHelper.ScrapeItem(itemUri, serverName, Modes.UndercutAlert);
-                itemInfo.MyListPrice = myPrice;
-                undercutAlertItems.Add(itemInfo);
+                var scrapeInfo = (UndercutAlertReturn)await _ffxiahHelper.ScrapeItem(itemUri, itemInfo.Server, Modes.UndercutAlert);
+                scrapeInfo.MyListPrice = myPrice;
+                undercutAlertItems.Add(scrapeInfo);
             }
 
             resultGrid.DataSource = undercutAlertItems;
-            resultGrid.Columns["Server"].Visible = false;
-            resultGrid.Columns["ItemName"].DisplayIndex = 0;
-            resultGrid.Columns["MyListPrice"].DisplayIndex = 1;
-            resultGrid.Columns["LastSalePrice"].DisplayIndex = 2;
+            //resultGrid.Columns["Server"].Visible = false;
+            resultGrid.Columns["Server"].DisplayIndex = 0;
+            resultGrid.Columns["ItemName"].DisplayIndex = 1;
+            resultGrid.Columns["MyListPrice"].DisplayIndex = 2;
+            resultGrid.Columns["LastSalePrice"].DisplayIndex = 3;
 
             foreach (DataGridViewRow row in resultGrid.Rows)
             {
@@ -47,7 +49,8 @@ namespace FFXIAHScrape.FFXIAHScrape.UndercutAlert
                 }
             }
             resultGrid.ClearSelection();
-            modeLabel.Text = $"LastRefreshed: {DateTime.Now.ToString("hh:mm:ss")}";
+            //modeLabel.Text = $"LastRefreshed: {DateTime.Now.ToString("hh:mm:ss")}";
+            modeLabel.Text = $"LastRefreshed: {DateTime.Now:hh:mm:ss}";
         }
     }
 }

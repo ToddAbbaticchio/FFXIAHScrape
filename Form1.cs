@@ -134,7 +134,14 @@ namespace FFXIAHScrape
                 return;
 
             var itemInfo = JsonConvert.DeserializeObject<ItemListInfoBase>(ItemList.SelectedItem.ToString());
-            
+
+            switch (ModeDrop.SelectedValue)
+            {
+                case Modes.UndercutAlert:
+                    itemInfo = JsonConvert.DeserializeObject<UndercutAlertItemInfo>(ItemList.SelectedItem.ToString());
+                    break;
+            }
+
             if (StackCheckBox.Checked && itemInfo.Stack == false)
             {
                 var currIndex = ItemList.SelectedIndex;
@@ -164,6 +171,7 @@ namespace FFXIAHScrape
                         ItemList.Items.Add(JsonConvert.SerializeObject(
                             new
                             {
+                                Server = Server1Drop.SelectedValue.ToString(),
                                 Item = TextBox.Text.Replace(" ", "-").Replace("'", ""),
                                 Id = Items.Info[TextBox.Text],
                                 Stack = StackCheckBox.Checked,
@@ -182,6 +190,7 @@ namespace FFXIAHScrape
                         ItemList.Items.Add(JsonConvert.SerializeObject(
                             new
                             {
+                                Server = Server1Drop.SelectedValue.ToString(),
                                 Item = TextBox.Text.Replace(" ", "-").Replace("'", ""),
                                 Id = Items.Info[TextBox.Text],
                                 Stack = StackCheckBox.Checked,
@@ -237,10 +246,10 @@ namespace FFXIAHScrape
                     switch (ModeDrop.SelectedValue)
                     {
                         case Modes.RareItemAlert:
-                            await _rareItemAlert.Action(ItemList, Result1Grid, ModeDisplay, Server1Drop.SelectedValue.ToString());
+                            await _rareItemAlert.Action(ItemList, Result1Grid, ModeDisplay);
                             break;
                         case Modes.UndercutAlert:
-                            await _undercutAlert.Action(ItemList, Result1Grid, ModeDisplay, Server1Drop.SelectedValue.ToString());
+                            await _undercutAlert.Action(ItemList, Result1Grid, ModeDisplay);
                             break;
 
                         case Modes.XServerArbitrage:

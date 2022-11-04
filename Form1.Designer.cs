@@ -41,6 +41,8 @@ namespace FFXIAHScrape
             this.RemFromListButton = new System.Windows.Forms.Button();
             this.ModeDrop = new System.Windows.Forms.ComboBox();
             this.ModeDisplay = new System.Windows.Forms.Label();
+            this.TextBox = new PHTextBox("Enter item name...");
+            this.ListPrice = new PHTextBox("Enter list price...");
             ((System.ComponentModel.ISupportInitialize)(this.Result1Grid)).BeginInit();
             this.SuspendLayout();
             // 
@@ -223,8 +225,7 @@ namespace FFXIAHScrape
         private System.Windows.Forms.Button RemFromListButton;
         private System.Windows.Forms.ComboBox ModeDrop;
         private System.Windows.Forms.Label ModeDisplay;
-        private FFXIAHScrape.Extensions.PHTextBox TextBox;
-        private FFXIAHScrape.Extensions.PHTextBox ListPrice;
+        private PHTextBox TextBox;
+        private PHTextBox ListPrice;
     }
 }
-
