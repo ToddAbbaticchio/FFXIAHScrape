@@ -26,7 +26,6 @@ namespace FFXIAHScrape.FFXIAHScrape.RareItemAlert
             }
 
             resultGrid.DataSource = alertItems;
-            //resultGrid.Columns["Server"].Visible = false;
             resultGrid.Columns["Server"].DisplayIndex = 0;
             resultGrid.Columns["ItemName"].DisplayIndex = 1;
             resultGrid.Columns["Stock"].DisplayIndex = 2;
@@ -43,6 +42,17 @@ namespace FFXIAHScrape.FFXIAHScrape.RareItemAlert
                 else
                 {
                     row.Cells[0].Style.BackColor = Color.LightGreen;
+                    var rowInfo = new
+                    {
+                        Stock = row.Cells["Stock"].Value.ToString().Trim(),
+                        ItemName = row.Cells["ItemName"].Value.ToString().Trim(),
+                        Server = row.Cells["Server"].Value.ToString().Trim(),
+                        LastSalePrice = row.Cells["LastSalePrice"].Value.ToString().Trim()
+                    };
+
+                    var discordMessage = new DiscordMessager();
+                    var message = $"Found ({rowInfo.Stock}) {rowInfo.ItemName} listed on {rowInfo.Server}! LastSalePrice: {rowInfo.LastSalePrice}";
+                    discordMessage.Post(message, Constants.discordRareItemWebhook);
                 }
             }
             resultGrid.ClearSelection();
