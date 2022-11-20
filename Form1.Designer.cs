@@ -1,6 +1,4 @@
-﻿using FFXIAHScrape.Extensions;
-
-namespace FFXIAHScrape
+﻿namespace FFXIAHScrape
 {
     partial class Form1
     {
@@ -41,8 +39,9 @@ namespace FFXIAHScrape
             this.RemFromListButton = new System.Windows.Forms.Button();
             this.ModeDrop = new System.Windows.Forms.ComboBox();
             this.ModeDisplay = new System.Windows.Forms.Label();
-            this.TextBox = new PHTextBox("Enter item name...");
-            this.ListPrice = new PHTextBox("Enter list price...");
+            this.SaveListButton = new System.Windows.Forms.Button();
+            this.ListPrice = new PHTextBox();
+            this.TextBox = new PHTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.Result1Grid)).BeginInit();
             this.SuspendLayout();
             // 
@@ -70,6 +69,7 @@ namespace FFXIAHScrape
             // 
             // ItemList
             // 
+            this.ItemList.AllowDrop = true;
             this.ItemList.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.ItemList.FormattingEnabled = true;
             this.ItemList.Location = new System.Drawing.Point(378, 76);
@@ -147,18 +147,25 @@ namespace FFXIAHScrape
             this.ModeDrop.TabIndex = 0;
             this.ModeDrop.SelectedIndexChanged += new System.EventHandler(this.ModeDrop_SelectedIndexChanged);
             // 
-            // TextBox
+            // ModeDisplay
             // 
-            this.TextBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.TextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-            this.TextBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this.TextBox.ForeColor = System.Drawing.Color.Gray;
-            this.TextBox.Location = new System.Drawing.Point(119, 76);
-            this.TextBox.Name = "TextBox";
-            this.TextBox.PlaceHolderText = "Enter Item Name...";
-            this.TextBox.Size = new System.Drawing.Size(162, 20);
-            this.TextBox.TabIndex = 3;
-            this.TextBox.Text = "Enter Item Name...";
+            this.ModeDisplay.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.ModeDisplay.AutoSize = true;
+            this.ModeDisplay.Location = new System.Drawing.Point(279, 9);
+            this.ModeDisplay.Name = "ModeDisplay";
+            this.ModeDisplay.Size = new System.Drawing.Size(91, 13);
+            this.ModeDisplay.TabIndex = 11;
+            this.ModeDisplay.Text = "ModeDisplayHere";
+            // 
+            // SaveListButton
+            // 
+            this.SaveListButton.Location = new System.Drawing.Point(295, 153);
+            this.SaveListButton.Name = "SaveListButton";
+            this.SaveListButton.Size = new System.Drawing.Size(75, 23);
+            this.SaveListButton.TabIndex = 12;
+            this.SaveListButton.Text = "SaveList";
+            this.SaveListButton.UseVisualStyleBackColor = true;
+            this.SaveListButton.Click += new System.EventHandler(this.SaveListButton_Click);
             // 
             // ListPrice
             // 
@@ -173,15 +180,18 @@ namespace FFXIAHScrape
             this.ListPrice.TabIndex = 4;
             this.ListPrice.Text = "Enter Listed Price...";
             // 
-            // ModeDisplay
+            // TextBox
             // 
-            this.ModeDisplay.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.ModeDisplay.AutoSize = true;
-            this.ModeDisplay.Location = new System.Drawing.Point(279, 9);
-            this.ModeDisplay.Name = "ModeDisplay";
-            this.ModeDisplay.Size = new System.Drawing.Size(91, 13);
-            this.ModeDisplay.TabIndex = 11;
-            this.ModeDisplay.Text = "ModeDisplayHere";
+            this.TextBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.TextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.TextBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.TextBox.ForeColor = System.Drawing.Color.Gray;
+            this.TextBox.Location = new System.Drawing.Point(119, 76);
+            this.TextBox.Name = "TextBox";
+            this.TextBox.PlaceHolderText = "Enter Item Name...";
+            this.TextBox.Size = new System.Drawing.Size(162, 20);
+            this.TextBox.TabIndex = 3;
+            this.TextBox.Text = "Enter Item Name...";
             // 
             // Form1
             // 
@@ -190,6 +200,7 @@ namespace FFXIAHScrape
             this.AutoScroll = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(734, 461);
+            this.Controls.Add(this.SaveListButton);
             this.Controls.Add(this.ModeDisplay);
             this.Controls.Add(this.ListPrice);
             this.Controls.Add(this.ModeDrop);
@@ -227,5 +238,6 @@ namespace FFXIAHScrape
         private System.Windows.Forms.Label ModeDisplay;
         private PHTextBox TextBox;
         private PHTextBox ListPrice;
+        private System.Windows.Forms.Button SaveListButton;
     }
 }

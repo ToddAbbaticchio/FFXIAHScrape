@@ -1,9 +1,11 @@
-﻿using FFXIAHScrape.Entities;
+﻿using Discord.Webhook;
+using FFXIAHScrape.Entities;
 using FFXIAHScrape.FFXIAHScrape._SharedModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -31,32 +33,39 @@ namespace FFXIAHScrape.FFXIAHScrape.RareItemAlert
             resultGrid.Columns["Stock"].DisplayIndex = 2;
             resultGrid.Columns["LastSalePrice"].DisplayIndex = 3;
 
+            var now = DateTime.Now.ToString("hh:mm:ss");
+            var discordMessageList = new List<string>();
+            discordMessageList.Add($"Last Updated: {now}");
+
+            var redList = new List<string>();
+            var greenList = new List<string>();
             foreach (DataGridViewRow row in resultGrid.Rows)
             {
-                var gridStock = Convert.ToInt16(row.Cells[0].Value);
-
-                if (gridStock == 0)
+                var rowInfo = new GridRowInfo(row);
+                var msg = $"{rowInfo.Server} — ({rowInfo.Qty}){rowInfo.Item.Replace(" ", "")}";
+                if (rowInfo.Qty == 0)
                 {
                     row.Cells[0].Style.BackColor = Color.Red;
+                    redList.Add(msg);
                 }
                 else
                 {
                     row.Cells[0].Style.BackColor = Color.LightGreen;
-                    var rowInfo = new
-                    {
-                        Stock = row.Cells["Stock"].Value.ToString().Trim(),
-                        ItemName = row.Cells["ItemName"].Value.ToString().Trim(),
-                        Server = row.Cells["Server"].Value.ToString().Trim(),
-                        LastSalePrice = row.Cells["LastSalePrice"].Value.ToString().Trim()
-                    };
-
-                    var discordMessage = new DiscordMessager();
-                    var message = $"Found ({rowInfo.Stock}) {rowInfo.ItemName} listed on {rowInfo.Server}! LastSalePrice: {rowInfo.LastSalePrice}";
-                    discordMessage.Post(message, Constants.discordRareItemWebhook);
+                    greenList.Add(msg + $" LastSalePrice({rowInfo.LastSale})");
                 }
             }
+
+            if (redList.Any())
+                discordMessageList.Add($"```fix{Environment.NewLine}{string.Join(Environment.NewLine, redList)}```");
+            if (greenList.Any())
+                discordMessageList.Add($"```yaml{Environment.NewLine}{string.Join(Environment.NewLine, greenList)}```");
+
+            // update discord message
+            var discord = new DiscordWebhookClient(Constants.discordRareItemWebhook);
+            await discord.ModifyMessageAsync(Constants.discordRareItemMessageId, m => m.Content = string.Join(Environment.NewLine, discordMessageList));
+
             resultGrid.ClearSelection();
-            modeLabel.Text = $"LastRefreshed: {DateTime.Now:hh:mm:ss}";
+            modeLabel.Text = $"LastRefreshed: {now}";
         }
     }
 }

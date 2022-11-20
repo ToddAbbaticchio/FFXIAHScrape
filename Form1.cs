@@ -5,7 +5,11 @@ using FFXIAHScrape.FFXIAHScrape.UndercutAlert;
 using FFXIAHScrape.FFXIAHScrape.XServerArbitrage;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace FFXIAHScrape
@@ -40,8 +44,13 @@ namespace FFXIAHScrape
             serverList2.Add("-- Choose Server 2 --");
             serverList2.Sort();
             Server2Drop.DataSource = serverList2;
+
+            ItemList.AllowDrop = true;
+            ItemList.DragDrop += ItemList_DragDrop;
+            ItemList.DragEnter += ItemList_DragEnter;
         }
 
+        #region Field Updates
         private void ModeDrop_SelectedIndexChanged(object sender, EventArgs e)
         {
             var stackCheckPos1 = new System.Drawing.Point(172, 107);
@@ -128,6 +137,86 @@ namespace FFXIAHScrape
             }
         }
 
+        private void ItemList_DragDrop(object sender, DragEventArgs e)
+        {
+            try
+            {
+                // Handle FileDrop data.
+                if (!e.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    return;
+                }
+                else
+                {
+                    string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                    if (files.Length > 1)
+                    {
+                        MessageBox.Show("One file at a time please!");
+                        return;
+                    }
+                    if (Path.GetExtension(files[0]) != ".json")
+                    {
+                        MessageBox.Show($"The provided file is a {Path.GetExtension(files[0])}, please provide a .json file");
+                        return;
+                    }
+                    foreach (var mode in Enum.GetValues(typeof(Modes)))
+                    {
+                        var modeText = mode.ToString();
+                        var fName = Path.GetFileName(files[0]);
+                        var modeDrop = ModeDrop.SelectedValue.ToString();
+
+                        if (fName.Contains(modeText) && modeDrop == modeText)
+                            break;
+
+                        if (fName.Contains(modeText) && modeDrop != modeText)
+                        {
+                            MessageBox.Show($"This file is for {modeText} but the current mode is set to {modeDrop}");
+                            return;
+                        }
+                    }
+
+                    var droppedFilePath = files[0];
+                    string droppedFileName = Path.GetFileName(files[0]);
+
+                    DialogResult dialogResult;
+                    dialogResult = MessageBox.Show($"Import: {droppedFilePath}?", "Import item list from file?", MessageBoxButtons.YesNo);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        var fileStream = new FileStream(droppedFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                        var streamReader = new StreamReader(fileStream, Encoding.Default);
+                        var allData = streamReader.ReadToEnd();
+                        var lines = Regex.Split(allData, "\n").ToList();
+                        fileStream.Close();
+                        streamReader.Close();
+
+                        ItemList.Items.Clear();
+                        foreach (var line in lines)
+                        {
+                            if (string.IsNullOrEmpty(line))
+                                continue;
+                            ItemList.Items.Add(line);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error importing file list!{Environment.NewLine}{ex.Message}");
+            }
+        }
+
+        private void ItemList_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None;
+            }
+        }
+
         private void StackCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             if (ItemList.SelectedIndex == -1)
@@ -158,7 +247,10 @@ namespace FFXIAHScrape
                 ItemList.Items.Insert(currIndex, JsonConvert.SerializeObject(itemInfo));
             }
         }
+        
+        #endregion
 
+        #region Button Clicks
         private void AddToListButton_Click(object sender, EventArgs e)
         {
             var inputString = TextBox.Text;
@@ -232,7 +324,45 @@ namespace FFXIAHScrape
             }
             ItemList.Items.RemoveAt(ItemList.SelectedIndex);
         }
-                
+
+        private void SaveListButton_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog exportItemList = new SaveFileDialog();
+            exportItemList.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            exportItemList.Title = "Export Item List";
+            exportItemList.CheckFileExists = false;
+            exportItemList.CheckPathExists = true;
+            exportItemList.DefaultExt = "json";
+            exportItemList.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+            exportItemList.FilterIndex = 2;
+            exportItemList.RestoreDirectory = true;
+            if (exportItemList.ShowDialog() == DialogResult.OK)
+            {
+                string finalName;
+                try
+                {
+                    var itemList = new List<string>();
+                    foreach (var item in ItemList.Items)
+                    {
+                        itemList.Add(item.ToString());
+                    }
+
+                    var mode = ModeDrop.SelectedValue.ToString();
+                    var mode1 = ModeDrop.SelectedText;
+                    var mode2 = ModeDrop;
+                    var fileName = Path.GetFileName(exportItemList.FileName);
+                    finalName = exportItemList.FileName.Replace(fileName, $"{ModeDrop.SelectedValue}-{fileName}");
+                    
+                    File.WriteAllLines(finalName, itemList);
+                    MessageBox.Show($"Item list exported to: {finalName}");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error exporting item list: {ex.Message}");
+                }
+            }
+        }
+
         private async void GoButton_Click(object sender, EventArgs e)
         {
             if (ItemList.Items.Count == 0) return;
@@ -256,7 +386,7 @@ namespace FFXIAHScrape
                             await _xServerArbitrage.Action(ItemList, Result1Grid, ModeDisplay, Server1Drop.SelectedValue.ToString(), Server2Drop.SelectedValue.ToString());
                             break;
                     }
-                    WaitWithoutLockingGui(300);
+                    WaitWithoutLockingUi(300);
                 }
             }
             else
@@ -266,8 +396,10 @@ namespace FFXIAHScrape
             }
             ModeDisplay.Text = "";
         }
+        
+        #endregion
 
-        public void WaitWithoutLockingGui(int seconds)
+        public void WaitWithoutLockingUi(int seconds)
         {
             var timer1 = new System.Windows.Forms.Timer();
             if (seconds <= 0) return;
