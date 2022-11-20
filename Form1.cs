@@ -368,25 +368,33 @@ namespace FFXIAHScrape
             if (ItemList.Items.Count == 0) return;
             if (!AutoRefreshMode)
             {
-                AutoRefreshMode = true;
-                GoButton.Text = "Stop Scraping";
-                
-                while (AutoRefreshMode == true)
+                try
                 {
-                    switch (ModeDrop.SelectedValue)
-                    {
-                        case Modes.RareItemAlert:
-                            await _rareItemAlert.Action(ItemList, Result1Grid, ModeDisplay);
-                            break;
-                        case Modes.UndercutAlert:
-                            await _undercutAlert.Action(ItemList, Result1Grid, ModeDisplay);
-                            break;
+                    AutoRefreshMode = true;
+                    GoButton.Text = "Stop Scraping";
 
-                        case Modes.XServerArbitrage:
-                            await _xServerArbitrage.Action(ItemList, Result1Grid, ModeDisplay, Server1Drop.SelectedValue.ToString(), Server2Drop.SelectedValue.ToString());
-                            break;
+                    while (AutoRefreshMode == true)
+                    {
+                        switch (ModeDrop.SelectedValue)
+                        {
+                            case Modes.RareItemAlert:
+                                await _rareItemAlert.Action(ItemList, Result1Grid, ModeDisplay);
+                                break;
+                            case Modes.UndercutAlert:
+                                await _undercutAlert.Action(ItemList, Result1Grid, ModeDisplay);
+                                break;
+
+                            case Modes.XServerArbitrage:
+                                await _xServerArbitrage.Action(ItemList, Result1Grid, ModeDisplay, Server1Drop.SelectedValue.ToString(), Server2Drop.SelectedValue.ToString());
+                                break;
+                        }
+                        WaitWithoutLockingUi(300);
                     }
-                    WaitWithoutLockingUi(300);
+                }
+                catch
+                {
+                    AutoRefreshMode = false;
+                    GoButton.Text = "Check FFXI-AH";
                 }
             }
             else

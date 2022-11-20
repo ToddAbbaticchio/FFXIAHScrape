@@ -13,6 +13,12 @@ namespace FFXIAHScrape.FFXIAHScrape.XServerArbitrage
 
         public async Task Action(ListBox itemList, DataGridView resultGrid, Label modeLabel, string s1Name, string s2Name)
         {
+            if (s1Name.Contains("Choose Server") || s2Name.Contains("Choose Server"))
+            {
+                MessageBox.Show("Servers must be selected before scraping!");
+                throw new Exception("Servers not selected.");
+            }
+
             var compareList = new List<CompareInfo>();
             foreach (string item in itemList.Items)
             {

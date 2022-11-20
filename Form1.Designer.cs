@@ -1,4 +1,6 @@
-﻿namespace FFXIAHScrape
+﻿using PHTextBox = FFXIAHScrape.PHTextBox;
+
+namespace FFXIAHScrape
 {
     partial class Form1
     {
@@ -40,8 +42,8 @@
             this.ModeDrop = new System.Windows.Forms.ComboBox();
             this.ModeDisplay = new System.Windows.Forms.Label();
             this.SaveListButton = new System.Windows.Forms.Button();
-            this.ListPrice = new FFXIAHScrape.PHTextBox();
-            this.TextBox = new FFXIAHScrape.PHTextBox();
+            this.ListPrice = new PHTextBox();
+            this.TextBox = new PHTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.Result1Grid)).BeginInit();
             this.SuspendLayout();
             // 
