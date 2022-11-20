@@ -40,8 +40,8 @@
             this.ModeDrop = new System.Windows.Forms.ComboBox();
             this.ModeDisplay = new System.Windows.Forms.Label();
             this.SaveListButton = new System.Windows.Forms.Button();
-            this.ListPrice = new PHTextBox();
-            this.TextBox = new PHTextBox();
+            this.ListPrice = new FFXIAHScrape.PHTextBox();
+            this.TextBox = new FFXIAHScrape.PHTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.Result1Grid)).BeginInit();
             this.SuspendLayout();
             // 
@@ -159,6 +159,7 @@
             // 
             // SaveListButton
             // 
+            this.SaveListButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.SaveListButton.Location = new System.Drawing.Point(295, 153);
             this.SaveListButton.Name = "SaveListButton";
             this.SaveListButton.Size = new System.Drawing.Size(75, 23);
