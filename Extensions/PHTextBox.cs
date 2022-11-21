@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 
-namespace FFXIAHScrape
+namespace FFXIAHScrape.Extensions
 {
     class PHTextBox : System.Windows.Forms.TextBox
     {

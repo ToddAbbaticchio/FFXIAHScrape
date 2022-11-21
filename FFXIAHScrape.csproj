@@ -140,6 +140,7 @@
     </Compile>
     <Compile Include="FFXIAHScrape\FFXIAhHelper.cs" />
     <Compile Include="FFXIAHScrape\XServerArbitrage\CompareInfo.cs" />
+    <Compile Include="FFXIAHScrape\XServerArbitrage\Models\XServerGridViewRow.cs" />
     <Compile Include="FFXIAHScrape\_SharedModels\GridViewRow.cs" />
     <Compile Include="FFXIAHScrape\_SharedModels\ItemListInfo.cs" />
     <Compile Include="FFXIAHScrape\_SharedModels\PriceHistory.cs" />

@@ -2,7 +2,10 @@
 using FFXIAHScrape.FFXIAHScrape._SharedModels;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Printing;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
 
 namespace FFXIAHScrape.FFXIAHScrape.XServerArbitrage
@@ -26,28 +29,62 @@ namespace FFXIAHScrape.FFXIAHScrape.XServerArbitrage
                 var s1 = (XServerArbitrageReturn)await _ffxiahHelper.ScrapeItem(itemUri, s1Name, Modes.XServerArbitrage);
                 var s2 = (XServerArbitrageReturn)await _ffxiahHelper.ScrapeItem(itemUri, s2Name, Modes.XServerArbitrage);
 
-                compareList.Add(new CompareInfo()
-                {
-                    ItemName = s1.ItemName,
-                    S1_Stock = s1.Stock,
-                    S1_Rate = s1.Rate,
-                    S1_Median = s1.LastSalePrice,
-                    S2_Stock = s2.Stock,
-                    S2_Rate = s2.Rate,
-                    S2_Median = s2.LastSalePrice,
-                });
+                compareList.Add(new CompareInfo(s1, s2));
             }
 
             // add results to the resultGrid
             resultGrid.DataSource = compareList;
-            // add server names to column headers
-            resultGrid.Columns[1].HeaderText = $"{s1Name}-Stock";
-            resultGrid.Columns[2].HeaderText = $"{s1Name}-Rate";
-            resultGrid.Columns[3].HeaderText = $"{s1Name}-LastSalePrice";
-            resultGrid.Columns[4].HeaderText = $"{s2Name}-Stock";
-            resultGrid.Columns[5].HeaderText = $"{s2Name}-Rate";
-            resultGrid.Columns[6].HeaderText = $"{s2Name}-LastSalePrice";
-            
+            resultGrid.Columns[9].Visible = false;
+            resultGrid.Columns[10].Visible = false;
+
+            // modify server specific headers with server first initial
+            resultGrid.Columns[1].HeaderText = $"{s1Name.Substring(0,1)}-Stock";
+            resultGrid.Columns[2].HeaderText = $"{s1Name.Substring(0, 1)}-Rate";
+            resultGrid.Columns[3].HeaderText = $"{s1Name.Substring(0, 1)}-LastPrice";
+            resultGrid.Columns[4].HeaderText = $"{s2Name.Substring(0, 1)}-Stock";
+            resultGrid.Columns[5].HeaderText = $"{s2Name.Substring(0, 1)}-Rate";
+            resultGrid.Columns[6].HeaderText = $"{s2Name.Substring(0, 1)}-LastPrice";
+            resultGrid.Columns[7].HeaderText = "Profit";
+            resultGrid.Columns[8].HeaderText = "Margin";
+
+            // sort mode
+            resultGrid.Columns[1].SortMode = DataGridViewColumnSortMode.Automatic;
+            resultGrid.Columns[2].SortMode = DataGridViewColumnSortMode.Automatic;
+            resultGrid.Columns[3].SortMode = DataGridViewColumnSortMode.Automatic;
+            resultGrid.Columns[4].SortMode = DataGridViewColumnSortMode.Automatic;
+            resultGrid.Columns[5].SortMode = DataGridViewColumnSortMode.Automatic;
+            resultGrid.Columns[6].SortMode = DataGridViewColumnSortMode.Automatic;
+            resultGrid.Columns[7].SortMode = DataGridViewColumnSortMode.Automatic;
+            resultGrid.Columns[8].SortMode = DataGridViewColumnSortMode.Automatic;
+
+            // fun with colors!
+            foreach (DataGridViewRow row in resultGrid.Rows)
+            {
+                var profit = (decimal)row.Cells[9].Value;
+                var margin = (decimal)row.Cells[10].Value;
+                var profitable = (profit > 0) ? true : false;
+
+                switch (profitable)
+                {
+                    case true when (margin < (decimal).2):
+                        row.Cells[7].Style.BackColor = Color.Orange;
+                        row.Cells[8].Style.BackColor = Color.Orange;
+                        break;
+                    case true when (margin < (decimal).5):
+                        row.Cells[7].Style.BackColor = Color.LemonChiffon;
+                        row.Cells[8].Style.BackColor = Color.LemonChiffon;
+                        break;
+                    case true when (margin > (decimal).5):
+                        row.Cells[7].Style.BackColor = Color.LightGreen;
+                        row.Cells[8].Style.BackColor = Color.LightGreen;
+                        break;
+                    case false:
+                        row.Cells[7].Style.BackColor = Color.Tomato;
+                        row.Cells[8].Style.BackColor = Color.Tomato;
+                        break;
+                }
+            }
+
             resultGrid.ClearSelection();
             modeLabel.Text = $"LastRefreshed: {DateTime.Now.ToString("hh:mm:ss")}";
         }

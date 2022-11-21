@@ -1,4 +1,4 @@
-﻿using PHTextBox = FFXIAHScrape.PHTextBox;
+﻿using FFXIAHScrape.Extensions;
 
 namespace FFXIAHScrape
 {
@@ -30,6 +30,7 @@ namespace FFXIAHScrape
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.Server1Drop = new System.Windows.Forms.ComboBox();
             this.Server2Drop = new System.Windows.Forms.ComboBox();
@@ -42,8 +43,8 @@ namespace FFXIAHScrape
             this.ModeDrop = new System.Windows.Forms.ComboBox();
             this.ModeDisplay = new System.Windows.Forms.Label();
             this.SaveListButton = new System.Windows.Forms.Button();
-            this.ListPrice = new PHTextBox();
-            this.TextBox = new PHTextBox();
+            this.ListPrice = new Extensions.PHTextBox();
+            this.TextBox = new Extensions.PHTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.Result1Grid)).BeginInit();
             this.SuspendLayout();
             // 
@@ -117,6 +118,8 @@ namespace FFXIAHScrape
             // Result1Grid
             // 
             this.Result1Grid.AllowUserToAddRows = false;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.Result1Grid.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             this.Result1Grid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
