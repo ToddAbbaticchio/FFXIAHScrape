@@ -388,7 +388,7 @@ namespace FFXIAHScrape
                                 await _xServerArbitrage.Action(ItemList, Result1Grid, ModeDisplay, Server1Drop.SelectedValue.ToString(), Server2Drop.SelectedValue.ToString());
                                 break;
                         }
-                        WaitWithoutLockingUi(300);
+                        BetterWaitWithoutLockingUi(TimeSpan.FromMinutes(5));
                     }
                 }
                 catch
@@ -407,25 +407,30 @@ namespace FFXIAHScrape
         
         #endregion
 
-        public void WaitWithoutLockingUi(int seconds)
+        public void BetterWaitWithoutLockingUi(TimeSpan length)
         {
-            var timer1 = new System.Windows.Forms.Timer();
-            if (seconds <= 0) return;
-
-            timer1.Interval = seconds * 1000;
-            timer1.Enabled = true;
-            timer1.Start();
-
-            timer1.Tick += (s, e) =>
+            DateTime start = DateTime.Now;
+            TimeSpan restTime = new TimeSpan(200000); // 20 milliseconds
+            while (true)
             {
-                timer1.Enabled = false;
-                timer1.Stop();
-            };
-
-            while (timer1.Enabled)
-            {
-                Application.DoEvents();
+                System.Windows.Forms.Application.DoEvents();
+                TimeSpan remainingTime = start.Add(length).Subtract(DateTime.Now);
+                if (remainingTime > restTime)
+                {
+                    System.Diagnostics.Debug.WriteLine(string.Format("1: {0}", remainingTime));
+                    // Wait an insignificant amount of time so that the
+                    // CPU usage doesn't hit the roof while we wait.
+                    System.Threading.Thread.Sleep(restTime);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine(string.Format("2: {0}", remainingTime));
+                    if (remainingTime.Ticks > 0)
+                        System.Threading.Thread.Sleep(remainingTime);
+                    break;
+                }
             }
         }
+
     }
 }
